@@ -47,5 +47,51 @@ Config = {
 		vec3(-1743.17, 2141.11, 121.18),
 		vec3(-1813.84, 2089.57, 134.21),
 		vec3(-1698.71, 2150.65, 110.41),
+	},
+	Stores = {
+		enabled = true,
+		locations = {
+			{
+				name = 'Wine Shop',
+				coords = vec3(-1879.54, 2062.55, 135.92),
+				ped = `a_m_m_farmer_01`,
+				inventory = {
+					{ name = 'wine_barrel', price = 10 },
+					{ name = 'wine_bottle_empty', price = 10 },
+				}
+			}
+		}
+	},
+	Varities = {
+		['Cabernet'] = {},
+		['Malbec'] = {},
+		['Pinot'] = {},
+		['Merlot'] = {},
+	},
+	Barrels = {
+		enabled = true,
+		model = 'prop_barrel_01a',
+		ageTimeMin = 5, -- Minutes: Minimum amount of time it takes for a barrel to age before it can be harvested.
+	},
+	Bottles = {
+		enabled = true,
+		stash = true, -- Allow players to put items into the bottles
+		slots = 1,
+		weight = 5000,
+	},
+	Deliveries = {
+		enabled = true,
+		payoutMin = 100,
+		payoutMax = 200,
+		locations = {
+			vec3(-1879.54, 2062.55, 135.92),
+			vec3(828.76, 2191.16, 52.37),
+		},
+		customers = {
+			'a_f_y_bevhills_02',
+			'a_f_y_business_04',
+			'a_m_m_bevhills_02',
+			'a_m_m_bevhills_01',
+		}
 	}
 }

@@ -173,3 +173,24 @@ for _, coords in pairs(grapeLocations) do
 		inside = toPickGrapes,
 	})
 end
+
+-- NEW STUFF
+
+if Config.Stores.enabled then
+    for k,v in pairs(Config.Stores.locations) do
+        exports.ox_target:addBoxZone({
+			coords = v.coords,
+			size = vector3(1.0, 1.0, 1.0),
+			debug = Config.Debug,
+			drawSprite = true,
+			options = {
+				{
+					label = 'Wine Shop',
+					icon = 'fas fa-wine-bottle',
+					event = 'some:event:here',
+					storeId = k,
+				}
+			}
+		})
+    end
+end

@@ -13,3 +13,32 @@ Vineyard Job For QBox
 - Ability to store small items inside bottles
 - Crafting Wine Varities
 - Packaging and delivering to NPCS.
+
+# Items
+
+```
+['wine_bottle_empty'] = {
+    label = 'Empty Wine Bottle',
+    description = 'Empty Wine Bottle'
+    weight = 100,
+    stack = true,
+    close = true,
+}
+
+['wine_barrel'] = {
+    label = 'Empty Wine Barrel',
+    description = 'Empty Wine Barrel'
+    weight = 5000,
+    stack = false,
+    close = true,
+}
+
+['wine_bottle'] = {
+    label = 'Wine Bottle',
+    description = 'Wine Bottle'
+    weight = 300,
+    stack = false,
+    close = true,
+}
+
+```
