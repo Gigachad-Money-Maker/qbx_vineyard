@@ -70,7 +70,7 @@ Config = {
 	},
 	Barrels = {
 		enabled = true,
-		model = 'prop_barrel_01a',
+		model = 'vw_prop_vw_barrel_01a',
 		ageTimeMin = 5, -- Minutes: Minimum amount of time it takes for a barrel to age before it can be harvested.
 	},
 	Bottles = {
