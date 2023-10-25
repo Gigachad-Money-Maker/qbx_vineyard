@@ -6,7 +6,7 @@ local function AddBarrel(coords)
         created = os.time(),
         coords = coords,
     }
-    TriggerClientEvent("vineyard:placeBarrel", -1, BARRELS)
+    TriggerClientEvent("vineyard:PlaceBarrel", -1, id, BARRELS[id])
 end
 
 local function RemoveBarrel(id)
@@ -17,12 +17,14 @@ local function UpdateBarrel(id, data)
     BARRELS[id] = data
 end
 
-lib.callback.register('vineyard:CanPlaceBarrel', function(source, coords)
-    if exports.ox_inventory:GetItemCount(source, 'wine_barrel') > 0 then
-        exports.ox_inventory:RemoveItem(source, 'wine_barrel', 1)
+RegisterNetEvent("vineyard:AttemptPlaceBarrel", function(coords)
+    local src = source
+
+    if exports.ox_inventory:GetItemCount(src, 'wine_barrel') > 0 then
+        exports.ox_inventory:RemoveItem(src, 'wine_barrel', 1)
         AddBarrel(coords)
-        return true
     else
-        return false
+        print("Player attempted to place a barrel without having one.")
     end
+
 end)

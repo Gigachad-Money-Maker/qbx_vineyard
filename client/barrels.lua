@@ -1,45 +1,55 @@
 local BARRELS = {}
 local BARREL = nil
-local placingBarrel = false
+local PlacingBarrel = false
 
 local Wait = Wait
 local SetEntityHeading = SetEntityHeading
 local SetEntityCoords = SetEntityCoords
 local SetEntityAlpha = SetEntityAlpha
+local IsControlPressed = IsControlPressed
+local IsControlJustReleased = IsControlJustReleased
 
 local function CleanBarrelZones()
     for _,v in pairs(BARRELS) do
-        v.zone:destroy()
+        v.zone:remove()
+        if v.object then
+            DeleteObject(v.object)
+        end
     end
 end
 
-local function CreateBarrelObect(barrelId)
-    local data = BARRELS[barrelId]
+local function CreateBarrelObect(self)
+    lib.requestModel(Config.Barrels.model)
+
+    local data = BARRELS[self.barrelId]
     local barrel = CreateObject(Config.Barrels.model, data.coords.x, data.coords.y, data.coords.z, false, false, false)
+    SetEntityCoords(barrel, data.coords.x, data.coords.y, data.coords.z)
     SetEntityHeading(barrel, data.coords.w)
     SetEntityCollision(barrel, true, false)
     SetEntityInvincible(barrel, true)
     FreezeEntityPosition(barrel, true)
-    BARRELS[barrelId].object = barrel
+    PlaceObjectOnGroundProperly(barrel)
+    BARRELS[self.barrelId].object = barrel
 end
 
-local function DeleteBarrelObject(barrelId)
-    local data = BARRELS[barrelId]
+local function DeleteBarrelObject(self)
+    local data = BARRELS[self.barrelId]
     if DoesEntityExist(data.object) then
         DeleteObject(data.object)
-        BARRELS[barrelId].object = nil
+        BARRELS[self.barrelId].object = nil
     end
 end
 
 local function AddBarrel(barrelId, data)
+    BARRELS[barrelId] = data
     local sphere = lib.zones.sphere({
         coords = data.coords.xyz,
         radius = 10,
         debug = true,
-        onEnter = CreateBarrelObect(barrelId),
-        onExit = DeleteBarrelObject(barrelId)
+        barrelId = barrelId,
+        onEnter = CreateBarrelObect,
+        onExit = DeleteBarrelObject
     })
-    BARRELS[barrelId] = data
     BARRELS[barrelId].zone = sphere
 end
 
@@ -62,55 +72,20 @@ local function SetupBarrels()
     end)
 end
 
-local function RotationToDirection(rotation)
-	local adjustedRotation =
-	{
-		x = (math.pi / 180) * rotation.x,
-		y = (math.pi / 180) * rotation.y,
-		z = (math.pi / 180) * rotation.z
-	}
-	local direction =
-	{
-		x = -math.sin(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
-		y = math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
-		z = math.sin(adjustedRotation.x)
-	}
-	return direction
-end
-
-local function RayCastGamePlayCamera(distance)
-    local cameraRotation = GetGameplayCamRot()
-	local cameraCoord = GetGameplayCamCoord()
-	local direction = RotationToDirection(cameraRotation)
-	local destination =
-	{
-		x = cameraCoord.x + direction.x * distance,
-		y = cameraCoord.y + direction.y * distance,
-		z = cameraCoord.z + direction.z * distance
-	}
-	local a, b, c, d, e = GetShapeTestResult(StartShapeTestRay(cameraCoord.x, cameraCoord.y, cameraCoord.z, destination.x, destination.y, destination.z, -1, cache.ped, 0))
-	return b, c, e
-end
-
-local function NewBarrel(coords)
-    local canPlace = lib.callback.await('vineyard:CanPlaceBarrel', false, coords)
-
-    if canPlace then
-
-    else
-
-    end
-end
-
 local function CancelPlacement()
     DeleteObject(BARREL)
     DeleteEntity(BARREL)
-    placingBarrel = false
+    PlacingBarrel = false
     BARREL = nil
 end
 
+local function NewBarrel(coords)
+    TriggerServerEvent("vineyard:AttemptPlaceBarrel", coords, GetEntityHeading(BARREL))
+    CancelPlacement()
+end
+
 local function AttemptPlaceBarrel()
-    if placingBarrel then return end
+    if PlacingBarrel then return end
 
     lib.requestModel(Config.Barrels.model)
 
@@ -124,11 +99,12 @@ local function AttemptPlaceBarrel()
     local heading = 0.0
     SetEntityHeading(BARREL, heading)
 
-    placingBarrel = true
+    PlacingBarrel = true
 
     CreateThread(function()
-        while placingBarrel do
-            local hit, coords, entity = RayCastGamePlayCamera(1000.0)
+        while PlacingBarrel do
+            local hit, _, coords, _, _ = lib.raycast.cam(511, 3, 7.0)
+
             if hit then
 
                 if IsControlPressed(0, 174) then
@@ -140,27 +116,34 @@ local function AttemptPlaceBarrel()
                     heading = heading - 5
                     if heading < 0 then heading = 360.0 end
                 end
-    
+
                 SetEntityCoords(BARREL, coords.x, coords.y, coords.z)
                 PlaceObjectOnGroundProperly(BARREL)
                 SetEntityHeading(BARREL, heading)
-                
+    
                 if IsControlJustReleased(0, 38) then
-                    NewBarrel(coords)
-                elseif IsControlJustReleased(0, 47) then
+                    NewBarrel(vec4(coords.x, coords.y, coords.z, heading))
+                end
+                
+                if IsControlJustReleased(0, 47) then
                     CancelPlacement()
                 end
+
             end
             Wait(0)
         end
     end)
 end
 
+RegisterNetEvent("vineyard:PlaceBarrel", function(barrelId, data)
+    AddBarrel(barrelId, data)
+end)
+
 RegisterNetEvent("vineyard:UpdateBarrel", function(barrelId, data)
     UpdateBarrel(barrelId, data)
 end)
 
-RegisterNetEvent("vineyard:removeBarrel", function(barrelId)
+RegisterNetEvent("vineyard:RemoveBarrel", function(barrelId)
     RemoveBarrel(barrelId)
 end)
 
