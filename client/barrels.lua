@@ -30,6 +30,16 @@ local function CreateBarrelObect(self)
     FreezeEntityPosition(barrel, true)
     PlaceObjectOnGroundProperly(barrel)
     BARRELS[self.barrelId].object = barrel
+
+    exports.ox_target:addEntity(NetworkGetNetworkIdFromEntity(barrel), {
+        {
+            label = "Pick up",
+            icon = "fas fa-wine-bottle",
+            serverEvent = "vineyard:AttemptPickupBarrel",
+            id = self.barrelId,
+            data = self.data
+        }
+    })
 end
 
 local function DeleteBarrelObject(self)
@@ -147,15 +157,19 @@ RegisterNetEvent("vineyard:RemoveBarrel", function(barrelId)
     RemoveBarrel(barrelId)
 end)
 
+RegisterNetEvent("vineyard:GetBarrels", function(serverBarrels)
+    BARRELS = serverBarrels
+end)
+
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
     CleanBarrelZones()
 end)
 
-AddEventHandler('onResourceStart', function(resourceName)
-    if resourceName ~= GetCurrentResourceName()  then return end
-    SetupBarrels()
-end)
+-- AddEventHandler('onResourceStart', function(resourceName)
+--     if resourceName ~= GetCurrentResourceName()  then return end
+--     SetupBarrels()
+-- end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     SetupBarrels()
