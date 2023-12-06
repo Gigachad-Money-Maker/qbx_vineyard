@@ -50,16 +50,14 @@ Config = {
 	},
 	Stores = {
 		enabled = true,
+		name = 'Wine Shop',
+		model = `a_m_m_farmer_01`,
+		items = {
+			{ name = 'wine_barrel', price = 10 },
+			{ name = 'wine_bottle_empty', price = 10 },
+		},
 		locations = {
-			{
-				name = 'Wine Shop',
-				coords = vec4(-1924.83, 2059.11, 140.83, 301.16),
-				ped = `a_m_m_farmer_01`,
-				inventory = {
-					{ name = 'wine_barrel', price = 10 },
-					{ name = 'wine_bottle_empty', price = 10 },
-				}
-			}
+			vec4(-1924.83, 2059.11, 139.83, 301.16)
 		}
 	},
 	Barrels = {
@@ -67,12 +65,6 @@ Config = {
 		model = 'vw_prop_vw_barrel_01a',
 		ageTimeMin = 5, -- Minutes: Minimum amount of time it takes for a barrel to age before it can be harvested.
 		requiredBottles = 1, -- Amount of bottles required to harvest a barrel.
-	},
-	Bottles = {
-		enabled = true,
-		stash = true, -- Allow players to put items into the bottles
-		slots = 1,
-		weight = 5000,
 	},
 	Deliveries = {
 		enabled = true,

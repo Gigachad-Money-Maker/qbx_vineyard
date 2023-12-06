@@ -56,14 +56,3 @@ RegisterNetEvent('qb-vineyard:server:receiveGrapeJuice', function()
 	addItem("grapejuice", math.random(Config.GrapeJuiceAmount.min, Config.GrapeJuiceAmount.max))
 end)
 
--- NEW STUFF
-
-if Config.Stores.enabled then
-    for k,v in pairs(Config.Stores.locations) do
-        exports.ox_inventory:RegisterShop('WineShop'..k, {
-            name = v.name,
-            inventory = v.inventory,
-            locations = { v.coords },
-        })
-    end
-end

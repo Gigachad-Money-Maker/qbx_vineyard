@@ -1,3 +1,5 @@
+if not Config.Barrels.enabled then return end
+
 local BARRELS = {}
 local BARREL = nil
 local PlacingBarrel = false
@@ -73,7 +75,7 @@ local function AddBarrel(barrelId, data)
     local sphere = lib.zones.sphere({
         coords = vec3(data.coords.x, data.coords.y, data.coords.z),
         radius = 10,
-        debug = true,
+        debug = false,
         barrelId = barrelId,
         onEnter = CreateBarrelObect,
         onExit = DeleteBarrelObject

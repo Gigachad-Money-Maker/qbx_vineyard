@@ -1,3 +1,5 @@
+if not Config.Barrels.enabled then return end
+
 local BARRELS = {}
 
 local function AddBarrel(coords, data)
@@ -112,11 +114,20 @@ RegisterNetEvent("vineyard:AttemptLabelBottle", function(label, image, slot)
 
     local item = exports.ox_inventory:GetSlot(src, slot)
 
+    if item.metadata.labeled then
+        TriggerClientEvent('ox_lib:notify', src, {
+            title = "This bottle is already labeled!",
+            type = "error"
+        })
+        return
+    end
+
     if item.name == "wine_bottle" then
         item.metadata.label = label or "Wine Bottle"
         if image ~= nil then
             item.metadata.image = image
         end
+        item.metadata.labeled = true
         exports.ox_inventory:SetMetadata(src, slot, item.metadata)
     else
         print("Player attempted to label a non-wine bottle.")
