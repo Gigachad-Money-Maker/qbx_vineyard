@@ -53,7 +53,7 @@ Config = {
 		locations = {
 			{
 				name = 'Wine Shop',
-				coords = vec3(-1879.54, 2062.55, 135.92),
+				coords = vec4(-1924.83, 2059.11, 140.83, 301.16),
 				ped = `a_m_m_farmer_01`,
 				inventory = {
 					{ name = 'wine_barrel', price = 10 },
@@ -62,16 +62,11 @@ Config = {
 			}
 		}
 	},
-	Varities = {
-		['Cabernet'] = {},
-		['Malbec'] = {},
-		['Pinot'] = {},
-		['Merlot'] = {},
-	},
 	Barrels = {
 		enabled = true,
 		model = 'vw_prop_vw_barrel_01a',
 		ageTimeMin = 5, -- Minutes: Minimum amount of time it takes for a barrel to age before it can be harvested.
+		requiredBottles = 1, -- Amount of bottles required to harvest a barrel.
 	},
 	Bottles = {
 		enabled = true,

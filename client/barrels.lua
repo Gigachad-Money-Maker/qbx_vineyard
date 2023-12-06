@@ -9,6 +9,10 @@ local SetEntityAlpha = SetEntityAlpha
 local IsControlPressed = IsControlPressed
 local IsControlJustReleased = IsControlJustReleased
 
+exports.ox_inventory:displayMetadata({
+    wine_age = "Wine Age",
+})
+
 local function CleanBarrelZones()
     for _,v in pairs(BARRELS) do
         v.zone:remove()
@@ -31,11 +35,25 @@ local function CreateBarrelObect(self)
     PlaceObjectOnGroundProperly(barrel)
     BARRELS[self.barrelId].object = barrel
 
-    exports.ox_target:addEntity(NetworkGetNetworkIdFromEntity(barrel), {
+    exports.ox_target:addLocalEntity(barrel, {
         {
             label = "Pick up",
             icon = "fas fa-wine-bottle",
             serverEvent = "vineyard:AttemptPickupBarrel",
+            id = self.barrelId,
+            data = self.data
+        },
+        {
+            label = "Check Barrel",
+            icon = "fas fa-magnifying-glass",
+            serverEvent = "vineyard:AttemptCheckBarrel",
+            id = self.barrelId,
+            data = self.data
+        },
+        {
+            label = "Tap Barrel",
+            icon = "fas fa-hand-holding-droplet",
+            serverEvent = "vineyard:AttemptTapBarrel",
             id = self.barrelId,
             data = self.data
         }
@@ -53,7 +71,7 @@ end
 local function AddBarrel(barrelId, data)
     BARRELS[barrelId] = data
     local sphere = lib.zones.sphere({
-        coords = data.coords.xyz,
+        coords = vec3(data.coords.x, data.coords.y, data.coords.z),
         radius = 10,
         debug = true,
         barrelId = barrelId,
@@ -65,8 +83,10 @@ end
 
 local function RemoveBarrel(barrelId)
     if BARRELS[barrelId].object then
-        DeleteBarrelObject(barrelId)
+        DeleteBarrelObject({ barrelId = barrelId })
     end
+
+    BARRELS[barrelId].zone:remove()
     BARRELS[barrelId] = nil
 end
 
@@ -157,8 +177,9 @@ RegisterNetEvent("vineyard:RemoveBarrel", function(barrelId)
     RemoveBarrel(barrelId)
 end)
 
-RegisterNetEvent("vineyard:GetBarrels", function(serverBarrels)
+RegisterNetEvent("vineyard:SetBarrels", function(serverBarrels)
     BARRELS = serverBarrels
+    SetupBarrels()
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -166,13 +187,19 @@ AddEventHandler('onResourceStop', function(resourceName)
     CleanBarrelZones()
 end)
 
--- AddEventHandler('onResourceStart', function(resourceName)
---     if resourceName ~= GetCurrentResourceName()  then return end
---     SetupBarrels()
--- end)
-
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     SetupBarrels()
+end)
+
+RegisterNetEvent("vineyard:LabelBottle", function(slot)
+    local input = lib.inputDialog('Bottle Labeling Service', {
+        {type = 'input', label = 'Label Name', description = '', required = true, min = 4, max = 24},
+        {type = 'input', label = 'Label Image', description = '', required = false},
+    })
+
+    if input then
+        TriggerServerEvent("vineyard:AttemptLabelBottle", input[1], input[2], slot)
+    end
 end)
 
 exports('wine_barrel', function(data, slot)
